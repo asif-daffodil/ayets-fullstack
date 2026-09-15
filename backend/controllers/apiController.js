@@ -1,5 +1,6 @@
 const User = require("../models/user")
 const bcrypt = require("bcrypt")
+const jwt = require("jsonwebtoken")
 
 const home = (req, res) => {
     res.status(200).json({
@@ -52,8 +53,49 @@ const allUser = (req, res) => {
     })
 }
 
+const login = (req, res) => {
+    const { email, password } = req.body
+
+    if (!email || !password) {
+        return res.status(400).json({
+            success: false,
+            msg: "All fields are required"
+        })
+    }
+
+    User.findOne({ email }).then(data => {
+        if (!data) {
+            return res.status(400).json({
+                success: false,
+                msg: "Data not found!"
+            })
+        }
+        bcrypt.compare(password, data.password).then(result => {
+            if (!result) {
+                return res.status(400).json({
+                    success: false,
+                    msg: "Wrong credential!"
+                })
+            }
+            const token = jwt.sign({user: data}, process.env.JWT_SECRET, { expiresIn: "30d" })
+            res.status(200).json({
+                success: true,
+                msg: "Login successfull!",
+                token
+            })
+        })
+    }).catch(err => {
+        return res.status(400).json({
+            success: false,
+            msg: "Something went wrong!"
+        })
+    })
+
+}
+
 module.exports = {
     home,
     register,
-    allUser
+    allUser,
+    login
 }

@@ -10,7 +10,8 @@ export default function Register() {
     const { register, handleSubmit, formState: { errors }, watch, reset } = useForm();
 
     const onSubmit = async (data) => {
-        const { name, email, password, gender } = data;
+        let { name, email, password, gender } = data;
+        email = email.toLowerCase();
         const response = await axios.post('http://localhost:4000/api/register', {name, email, password, gender});
         if(response.data.success === true){
             toast.success(response.data.msg);

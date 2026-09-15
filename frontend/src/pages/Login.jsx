@@ -1,11 +1,30 @@
+import axios from "axios";
 import { Helmet } from "react-helmet";
+import { useForm } from "react-hook-form";
 import { Link } from "react-router";
+import { toast, ToastContainer } from "react-toastify";
 
 
 export default function Login() {
+    const { register, handleSubmit, formState: { errors }, reset } = useForm();
+
+    const onSubmit = async (data) => {
+        let { email, password } = data;
+        email = email.toLowerCase();
+        try {
+            const response = await axios.post('http://localhost:4000/api/login', { email, password });
+            if (response.data.success === true) {
+                toast.success(response.data.msg);
+                reset();
+            }
+        } catch (error) {
+            toast.error(error.response?.data?.msg || "Something went wrong!");
+        }
+    }
 
     return (
         <main className="bg-gray-50 px-4 md:px-8 dark:bg-neutral-900">
+            <ToastContainer position="bottom-right" />
             <Helmet>
                 <title>Log-in page</title>
             </Helmet>
@@ -19,23 +38,25 @@ export default function Login() {
                         className="p-6 rounded-lg bg-white border border-slate-300 shadow-xs md:p-8 dark:bg-neutral-800 dark:border-neutral-700">
                         <h1 className="text-slate-900 text-center text-3xl font-bold dark:text-slate-50">Sign in</h1>
 
-                        <form className="space-y-6 mt-10">
+                        <form className="space-y-6 mt-10" onSubmit={handleSubmit(onSubmit)}>
                             <div>
                                 <label htmlFor="email"
                                     className="mb-2 text-slate-900 font-medium text-sm inline-block dark:text-slate-50">Email</label>
-                                <input type="email" id="email" name="email" placeholder="john@readymadeui.com" required
+                                <input type="email" id="email" {...register("email", { required: "Email is required" })} placeholder="john@readymadeui.com"
                                     className="px-3 py-2.5 text-sm text-slate-900 rounded-md bg-white w-full outline-1 -outline-offset-1 outline-slate-300 focus:outline-2 focus:-outline-offset-2 focus:outline-blue-600 dark:text-slate-50 dark:bg-neutral-700 dark:outline-neutral-600" />
+                                {errors.email && <p className="text-red-500 text-sm mt-1">{errors.email.message}</p>}
                             </div>
                             <div>
                                 <label htmlFor="password"
                                     className="mb-2 text-slate-900 font-medium text-sm inline-block dark:text-slate-50">Password</label>
-                                <input type="password" id="password" name="password" placeholder="••••••••" required
+                                <input type="password" id="password" {...register("password", { required: "Password is required" })} placeholder="••••••••"
                                     className="px-3 py-2.5 text-sm text-slate-900 rounded-md bg-white w-full outline-1 -outline-offset-1 outline-slate-300 focus:outline-2 focus:-outline-offset-2 focus:outline-blue-600 dark:text-slate-50 dark:bg-neutral-700 dark:outline-neutral-600" />
+                                {errors.password && <p className="text-red-500 text-sm mt-1">{errors.password.message}</p>}
                             </div>
 
                             <div className="flex items-start flex-wrap gap-2">
                                 <label className="flex items-center group has-[input:checked]:text-slate-900">
-                                    <input id="remember" name="remember" type="checkbox" required className="sr-only" />
+                                    <input id="remember" name="remember" type="checkbox" className="sr-only" />
                                     {/* Custom box */}
                                     <span className="flex h-4 w-4 shrink-0 items-center justify-center rounded outline-1 outline-slate-300 dark:outline-neutral-600
                                  bg-white dark:bg-neutral-700
