@@ -25,11 +25,13 @@ const register = async (req, res) => {
         password: hashedPassword
     }).then(user => {
         res.status(200).json({
+            success: true,
             msg: "User registered successfully",
             user
         })
     }).catch(err => {
         res.status(500).json({
+            success: false,
             msg: "Error occurred while registering user",
             err
         })
