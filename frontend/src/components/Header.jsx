@@ -1,10 +1,20 @@
-import { useState, useEffect, useRef } from 'react';
-import { NavLink } from 'react-router';
+import { useState, useEffect, useRef } from 'react'
+import { NavLink, useNavigate } from 'react-router'
+import useAuth from '../hooks/useAuth'
 
 export default function Header() {
-    const [isMenuOpen, setIsMenuOpen] = useState(false);
-    const menuRef = useRef(null);
-    const lastFocusedElementRef = useRef(null);
+    const [isMenuOpen, setIsMenuOpen] = useState(false)
+    const menuRef = useRef(null)
+    const lastFocusedElementRef = useRef(null)
+    const { isAuthenticated, refreshAuth } = useAuth();
+    const navigate = useNavigate();
+
+    const handleLogout = async () => {
+        localStorage.removeItem('token');
+        window.dispatchEvent(new Event('auth-change'));
+        await refreshAuth();
+        navigate('/login');
+    }
 
     const openMenu = () => {
         lastFocusedElementRef.current = document.activeElement;
@@ -139,24 +149,41 @@ export default function Header() {
                                 Contact
                             </a>
                         </li>
-                        <li>
-                            <NavLink
-                                to="/login"
-                                className="hover:text-blue-700 dark:hover:text-blue-400 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 rounded"
-                            >
-                                Log in
-                            </NavLink>
-                        </li>
+                        {isAuthenticated ? (
+                            <li>
+                                <button
+                                    onClick={handleLogout}
+                                    className="hover:text-blue-700 dark:hover:text-blue-400 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 rounded"
+                                >
+                                    Logout
+                                </button>
+                            </li>
+                        ) : (
+                            <>
+                                <li>
+                                    <NavLink
+                                        to="/login"
+                                        className="hover:text-blue-700 dark:hover:text-blue-400 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 rounded"
+                                    >
+                                        Log in
+                                    </NavLink>
+                                </li>
+                                <li>
+                                    <NavLink
+                                        to="/register"
+                                        className="hover:text-blue-700 dark:hover:text-blue-400 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 rounded"
+                                    >
+                                        Sign up
+                                    </NavLink>
+                                </li>
+                            </>
+                        )
+                        }
                     </ul>
                 </div>
 
                 <div className="flex items-center gap-4 lg:ml-4">
-                    <NavLink
-                        to="/register"
-                        className="py-2 px-3.5 text-sm rounded-md font-semibold cursor-pointer text-white border border-blue-600 bg-blue-600 hover:bg-blue-700 transition-all focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500"
-                    >
-                        Sign up
-                    </NavLink>
+
 
                     <button
                         type="button"

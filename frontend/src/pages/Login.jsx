@@ -8,7 +8,7 @@ import useAuth from "../hooks/useAuth";
 
 export default function Login() {
     // redirect to home page if user is already logged in by using useAuth hook
-    const { isAuthenticated, loading } = useAuth();
+    const { isAuthenticated, loading, refreshAuth } = useAuth();
     const navigate = useNavigate();
 
     const { register, handleSubmit, formState: { errors }, reset } = useForm();
@@ -30,8 +30,11 @@ export default function Login() {
             const response = await axios.post('http://localhost:4000/api/login', { email, password });
             if (response.data.success === true) {
                 localStorage.setItem('token', response.data.token);
+                window.dispatchEvent(new Event('auth-change'));
+                await refreshAuth();
                 toast.success(response.data.msg);
                 reset();
+                navigate('/');
             }
         } catch (error) {
             toast.error(error.response?.data?.msg || "Something went wrong!");
