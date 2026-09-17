@@ -68,14 +68,17 @@ export default function Register() {
                                     <label htmlFor="email"
                                         className="mb-2 text-slate-900 font-medium text-sm inline-block dark:text-slate-50">Email</label>
                                     <input type="email" id="email" {...register("email", {
-                                        required: true,
+                                        required: {
+                                            value: true,
+                                            message: "Email is required"
+                                        },
                                         pattern: {
                                             value: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
                                             message: "Invalid email address"
                                         }
                                     })} placeholder="john@readymadeui.com"
                                         className="px-3 py-2.5 text-sm text-slate-900 rounded-md bg-white w-full outline-1 -outline-offset-1 outline-slate-300 focus:outline-2 focus:-outline-offset-2 focus:outline-blue-600 dark:text-slate-50 dark:bg-neutral-700 dark:outline-neutral-600" />
-                                    {errors.email && <p className="text-red-500 text-sm mt-1">Email is required</p>}
+                                    {errors.email && <p className="text-red-500 text-sm mt-1">{errors.email.message}</p>}
                                 </div>
                                 <div>
                                     <label htmlFor="password"
