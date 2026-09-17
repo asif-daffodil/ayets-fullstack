@@ -1,12 +1,27 @@
 import axios from "axios";
 import { Helmet } from "react-helmet";
 import { useForm } from "react-hook-form";
-import { Link } from "react-router";
+import { Link, useNavigate } from "react-router";
 import { toast, ToastContainer } from "react-toastify";
+import useAuth from "../hooks/useAuth";
 
 
 export default function Login() {
+    // redirect to home page if user is already logged in by using useAuth hook
+    const { isAuthenticated, loading } = useAuth();
+    const navigate = useNavigate();
+
     const { register, handleSubmit, formState: { errors }, reset } = useForm();
+
+    if (loading) {
+        return <div>Loading...</div>;
+    }
+
+    if (isAuthenticated) {
+        navigate("/");
+    }
+
+    
 
     const onSubmit = async (data) => {
         let { email, password } = data;
@@ -14,6 +29,7 @@ export default function Login() {
         try {
             const response = await axios.post('http://localhost:4000/api/login', { email, password });
             if (response.data.success === true) {
+                localStorage.setItem('token', response.data.token);
                 toast.success(response.data.msg);
                 reset();
             }

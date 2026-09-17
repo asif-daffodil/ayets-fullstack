@@ -93,9 +93,27 @@ const login = (req, res) => {
 
 }
 
+const checkAuth = (req, res) => {
+    const {token} = req.body
+    jwt.verify(token, process.env.JWT_SECRET, (err, decoded) => {
+        if (err) {
+            return res.status(401).json({
+                success: false,
+                msg: "Invalid token!"
+            })
+        }
+        res.status(200).json({
+            success: true,
+            msg: "Token is valid!",
+            user: decoded.user
+        })
+    })
+}
+
 module.exports = {
     home,
     register,
     allUser,
-    login
+    login,
+    checkAuth
 }
